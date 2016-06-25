@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import a.Queue.*;
 
 public class AdjGraph {
 	private HashMap<String, Vertex> v;
@@ -21,17 +20,16 @@ public class AdjGraph {
 	public class Vertex{
 		protected int color;
 		protected String parent;
-		protected String son;
+		protected Vertex p;
 		protected double d;
 		protected double f;
 		protected String id;
-		private int weight;
+		protected int weight;
 		protected HashMap<String, String> adj;
 		
 		Vertex(){
 			this.color = 0;
 			this.parent = null;
-			this.son = null;
 			this.d = 1E10;
 			this.f = 1E10;
 			this.id = null;
@@ -42,14 +40,13 @@ public class AdjGraph {
 		Vertex(String id){
 			this.color = 0;
 			this.parent = null;
-			this.son = null;
 			this.d = 1E10;
 			this.f = 1E10;
 			this.id = id;
 			this.weight = 0;
 			this.adj = new HashMap();
 		}
-		
+	
 		void VertexAdd(Vertex v){
 			this.adj.put(v.id, v.id);
 			v.weight++;
@@ -105,7 +102,8 @@ public class AdjGraph {
 		self.f = v.f;
 		self.id = v.id;
 		self.weight = v.weight;
-		self.adj = v.adj;
+		HashMap<String, String> tmp = new HashMap<String, String>(v.adj);
+		self.adj = tmp;
 	}
 	
 	Vertex newVertex(){
@@ -120,7 +118,9 @@ public class AdjGraph {
 	boolean containsFriend(String self, String friend){
 		return v(self).adj.containsKey(friend);
 	}
-	
+	int numFriend(String id){
+		return v(id).weight;
+	}
 	boolean containsKey(String key){
 		return this.v.containsKey(key);
 	}
@@ -130,28 +130,13 @@ public class AdjGraph {
 		ArrayList<ArrayList<String>> a = new ArrayList();
 		a = d.scc();
 		
-		int max[] = new int[5];
-		int index[] = new int[5];
-		for(int i = 0; i < 5; i++){
-			max[i] = a.get(i).size();
-			index[i] = i;
-		}
-		for(int i = 5; i < a.size(); i++){
-			for(int j = 0; j < 5; j++){
-				if(a.get(i).size() > max[j]){
-					for(int k = 4; k > j; k++){
-						max[k] = max[k - 1];
-						index[k] = index[k - 1];
-					}
-					max[j] = a.get(i).size();
-					index[j] = i;
-				}
-			}
-		}
+		DFSHEAP dh = new DFSHEAP(a);
 		ArrayList<ArrayList<String>> res = new ArrayList();
-		for(int i = 0; i < 5; i++)
-			res.add(a.get(index[i]));
+		for(int i = 0; i < 5; i++){
+			res.add(dh.extractMax());
+		}
 		
-		return res;
+		return a;
 	}
+
 }

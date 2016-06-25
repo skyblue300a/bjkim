@@ -10,11 +10,13 @@ public class DFS {
 	private HashMap<String, Vertex> v;
 	private int time;
 	private AdjGraph g;
+	private ArrayList <String> a;
 	
 	DFS(AdjGraph g){
 		this.v = g.graph();
 		this.time = 0;
 		this.g = g;
+		this.a = new ArrayList();
 	}
 	
 	Vertex v(String id){
@@ -62,8 +64,7 @@ public class DFS {
 		i = u.keySet().iterator();
 		while(i.hasNext()){
 			String key = i.next();
-			u.get(key).adj = null;
-			u.get(key).adj = new HashMap();
+			u.get(key).adj.clear();
 		}
 		i = this.v.keySet().iterator();
 		while(i.hasNext()){
@@ -74,18 +75,18 @@ public class DFS {
 				u.get(ad).adj.put(key, key);
 			}
 		}
-		this.v = null;
+		this.v.clear();
 		this.v = new HashMap(u);
 	}
 	
 	void scc_find(Vertex v){
+		a.add(v.id);
 		v.color = BLACK;
 		Iterator<String> i = v.adj.keySet().iterator();
 		while(i.hasNext()){
 			String key = i.next();
 			if(v(key).color == WHITE){
 				v(key).parent = v.id;
-				v.son = v(key).id;
 				this.scc_find(v(key));
 			}
 		}
@@ -100,28 +101,18 @@ public class DFS {
 			s[i].color = WHITE;
 			s[i].parent = null;
 		}
+
+		ArrayList<ArrayList<String>> x = new ArrayList();
 		for(int i = 0; i < v.size(); i++){
 			if(s[i].color == WHITE){
+				a.clear();
 				scc_find(s[i]);
+				ArrayList<String> tmp = new ArrayList(a);
+				x.add(tmp);
 			}
 		}
 
-		ArrayList<ArrayList<String>> a = new ArrayList();
-		for(int i = 0; i < v.size(); i++){
-			if(s[i].parent == null){
-				ArrayList<String> k = new ArrayList();
-				Vertex tmp = g.newVertex();
-				tmp = s[i];
-				while(true){
-					k.add(tmp.id);
-					if(tmp.son == null) break;
-					tmp = v(tmp.son);
-				}
-			a.add(k);
-			}
-			
-		}
-		
-		return a;
+	
+		return x;
 	}
 }

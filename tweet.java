@@ -2,6 +2,8 @@ package a;
 
 import java.util.*;
 import java.io.*;
+
+import a.AdjGraph.Vertex;
 import a.FileRead.*;
 import a.Heap.*;
 
@@ -10,9 +12,9 @@ public class tweet {
 		Scanner scan = new Scanner(System.in);
 		String menu = "";
         
-		File userprofile = new File("c:\\user.txt");
-		File userfriend = new File("c:\\friend.txt");
-		File userword = new File("c:\\word.txt");
+		File userprofile = new File("c:\\users.txt");
+		File userfriend = new File("c:\\friends.txt");
+		File userword = new File("c:\\words.txt");
 		
 		FileRead f = new FileRead();
 		
@@ -48,6 +50,7 @@ public class tweet {
 	            words = tmp.words;
 	            users = tmp.users;
 	            
+	           
 	            System.out.println("Total users: " + f.getTotalUsers());
 	            System.out.println("Total friendship records: " + f.getTotalFriend());
 	            System.out.println("Total tweets: " + f.getTotalTweets());
@@ -55,6 +58,9 @@ public class tweet {
 	    	else if(menu.equals("1")){
 	    		Heap heap = new Heap(users);
 	    		
+	    		System.out.println("Average number of friends: " + (f.getTotalTweets() / f.getTotalUsers()));
+		        System.out.println("Minimum friends: " + f.minf);
+		        System.out.println("Maximum friends: " + f.maxf);
 	    		System.out.println("Average tweets per user: " +(f.getTotalTweets() / f.getTotalUsers()));
 	    		System.out.println("Minimum tweets per user: " + heap.extractMin().total);
 	    		System.out.println("Maximum tweets per user: " + heap.extractMax().total);
@@ -139,6 +145,7 @@ public class tweet {
 	    						}
 	    					}
 	    					users.get(user).minusUser();
+	    					f.TotalFriend -= friends.numFriend(user);
 	    					userProfile.remove(user);
 	    					friends.deleteVertex(user);
 	    					i.remove();
@@ -154,9 +161,39 @@ public class tweet {
 	    	else if(menu.equals("8")){
 	    		ArrayList<ArrayList<String>> pr = friends.fiveSCC();
 	    		for(int i = 0; i < 5; i++){
-	    			System.out.println(pr.get(i));
+	    			for(int j = 0; j < pr.get(i).size(); i++){
+						System.out.println(userProfile.get(pr.get(i).get(j)));
+	    			}
+	    		}
+	    	}
+	    	else if(menu.equals("9")){
+	    		System.out.print("Write a user id(in number): ");
+	    		String dijid = scan.nextLine();
+	    		Dijsktra d = new Dijsktra(friends);
+	    		ArrayList<Vertex> a = d.dij(dijid);
+	    		Collections.sort(a, new VertexDescen());
+	    		for(int i = 0; i < a.size(); i++){
+	    			System.out.println(userProfile.get(a.get(i).id) + ": " + a.get(i).d);
+	    		}
+	    		for(int i = 0; i < 5; i++){
+	    			Vertex tmp = a.get(i);
+	    			System.out.print(userProfile.get(tmp.id));
+	    			tmp = tmp.p;
+	    			while(tmp!=null){
+	    				System.out.print("->" + userProfile.get(tmp.id));
+	    				tmp = tmp.p;
+	    			}
+	    			System.out.println();
 	    		}
 	    	}
 	    }
+	}
+	public static class VertexDescen implements Comparator<Vertex>{
+		@Override
+		public int compare(Vertex a, Vertex b){
+			if(a.d > b.d) return -1;
+			else if(a.d < b.d) return 1;
+			return 0;
+		}
 	}
 }

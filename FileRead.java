@@ -4,13 +4,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 import a.AdjGraph.*;
 
 public class FileRead {
 	private static int TotalUsers;
 	private static int TotalTweets;
-	private static int TotalFriend;
+	static int TotalFriend;
+	int maxf = -1;
+	int minf = -1;
 	
 	int getTotalUsers(){
 		return TotalUsers;
@@ -39,6 +42,7 @@ public class FileRead {
 					g.putVertex(friend);
 				if(!g.containsFriend(self, friend))
 					g.addVertex(self, friend);
+				
 				TotalFriend++;
 			}
 			
@@ -46,6 +50,19 @@ public class FileRead {
 
 		} catch (Exception ex) {
 
+		}
+		Iterator<String> i = g.graph().keySet().iterator();
+		while(i.hasNext()){
+
+			String key = i.next();
+			int tmp = g.numFriend(key);
+			if(maxf == -1 && minf == -1){
+				maxf = minf = tmp;
+			}
+			else{
+				if(tmp > maxf) maxf = tmp;
+				if(tmp < minf) minf = tmp;
+			}
 		}
 		return g;
 		
